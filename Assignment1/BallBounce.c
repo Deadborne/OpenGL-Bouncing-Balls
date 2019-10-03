@@ -17,22 +17,23 @@
 //a few Global Variables (sue me) for original ball, gravity, screen refresh.
 
 char title[] = "Bouncing Ball";  // Window title
-int windowWidth = 800;     // Window width
+int windowWidth = 1600;     // Window width
 int windowHeight = 600;     // Window height
-int windowPosX = 50;      // Window's top-left corner x
-int windowPosY = 50;      // Window's top-left corner y
+int windowPosX = 150;      // Window's top-left corner x
+int windowPosY = 150;      // Window's top-left corner y
 
 int refreshMillis = 33;      // Screen refresh period (milliseconds). 30FPS = 33 milliseconds per frame.
 GLfloat grav = 0.02; //faux gravitational constant
 
 static int numberBalls = -1;
 
+
 //generate a number to determine how many additional balls
 int random()
 {
 	int r;
 	srand(time(NULL));
-	r = rand() % 7 + 2;
+	r = rand() % 4 + 2;
 	printf("Your random number is %d\n", r);
 	return r;
 };
@@ -45,7 +46,7 @@ struct BouncyBall {
 	GLfloat xSpeed, ySpeed;
 	bool glock;
 };
-static struct BouncyBall ballArray[8];
+static struct BouncyBall ballArray[11];
 
 GLfloat v1, v2, v3, v4, v5, v6, v7, v8, v9;
 
@@ -82,11 +83,11 @@ void display() {
 	glClear(GL_COLOR_BUFFER_BIT);  // Clear the color buffer
 	glMatrixMode(GL_MODELVIEW);    // To operate on the model-view matrix
 	glLoadIdentity();              // Reset model-view matrix
-
+	/*
 	//ball1
 	// Use triangular segments to form a circle
 	glBegin(GL_TRIANGLE_FAN);
-	glColor4f(1.0f, 0.0f, 0.5f, 0.5f);  // Color of ball with alpha for transparency (4th param)
+	glColor4f(0.0f, 0.0f, 0.0f, 1.0f);  // Color of ball with alpha for transparency (4th param)
 	glVertex2f(ballX, ballY);       // Center of circle
 	int numSegments = 100;
 	GLfloat angle;
@@ -99,7 +100,7 @@ void display() {
 	//ball2
 	// Use triangular segments to form a circle
 	glBegin(GL_TRIANGLE_FAN);
-	glColor4f(0.0f, 0.5f, 1.0f, 0.5f);  // Color of ball with alpha for transparency (4th param)
+	glColor4f(0.0f, 0.0f, 0.0f, 1.0f);  // Color of ball with alpha for transparency (4th param)
 	glVertex2f(ballX1, ballY1);       // Center of circle
 	GLfloat angle1;
 	for (int i = 0; i <= numSegments; i++) { // Last vertex same as first vertex
@@ -107,8 +108,9 @@ void display() {
 		glVertex2f(ballX1 + cos(angle1) * ballRadius1, ballY1 + sin(angle1) * ballRadius1);
 	}
 	glEnd();
-
+	*/
 	//all balls in BallArray
+	int numSegments = 100;
 	for (int i = 0; i <= (sizeof(ballArray) / sizeof(struct BouncyBall)); i++)
 	{
 		glBegin(GL_TRIANGLE_FAN);
@@ -132,13 +134,14 @@ void display() {
 
 	glutSwapBuffers();  // Swap front and back buffers (of double buffered mode)
 
+	/*
 	// Animation Control - compute the location for the next refresh
 	ballX += xSpeed;
 	ballY += ySpeed;
 
 	ballX1 += xSpeed1;
 	ballY1 += ySpeed1;
-	
+	*/
 
 	//location for balls in array
 	for (int i = 0; i <= (sizeof(ballArray) / sizeof(struct BouncyBall)); i++) {
@@ -152,6 +155,7 @@ void display() {
 		ballArray[i].glock = true;
 	}
 
+	/*
 	// Check if ball 1 exceeds the edges
 	if (ballX > ballXMax) {
 		ballX = ballXMax;
@@ -189,29 +193,31 @@ void display() {
 		ySpeed1 = -ySpeed1;
 		gravlock1 = true;
 	}
+	*/
 
 	//check if array balls exceed the edges
 	for (int i = 0; i <= (sizeof(ballArray) / sizeof(struct BouncyBall)); i++)
 	{
 		if (ballArray[i].xSpawn > ballXMax) {
 			ballArray[i].xSpawn = ballXMax;
-			ballArray[i].xSpeed = (ballArray[i].xSpeed) * -1;
+			ballArray[i].xSpeed = -ballArray[i].xSpeed;
 		}
 		else if (ballArray[i].xSpawn < ballXMin){
 			ballArray[i].xSpawn = ballXMin;
-			ballArray[i].xSpeed = -1 * (ballArray[i].xSpeed);
+			ballArray[i].xSpeed = -ballArray[i].xSpeed;
 		}
 		if (ballArray[i].ySpawn > ballYMax) {
 			ballArray[i].ySpawn = ballYMax;
-			ballArray[i].ySpeed = -1 * (ballArray[i].ySpeed);
+			ballArray[i].ySpeed = -ballArray[i].ySpeed;
 		}
 		else if (ballArray[i].ySpawn < ballYMin) {
 			ballArray[i].ySpawn = ballYMin;
-			ballArray[i].ySpeed = -1 * (ballArray[i].ySpeed);
+			ballArray[i].ySpeed = -ballArray[i].ySpeed;
 			ballArray[i].glock = true;
 		}
 	}
 
+	/*
 	//collision detection between balls
 	if (sqrt((ballY1 - ballY)*(ballY1 - ballY) + (ballX1 - ballX)*(ballX1 - ballX)) <= (ballRadius1 + ballRadius))
 	{
@@ -220,15 +226,9 @@ void display() {
 			if (xSpeed1 > 0)
 			{
 				if (ballX > ballX1)
-				{
-					xSpeed += xSpeed1;
 					xSpeed1 = -xSpeed1;
-				}
 				else
-				{
-					xSpeed1 += xSpeed;
 					xSpeed = -xSpeed;
-				}
 			}
 			else
 			{
@@ -241,15 +241,9 @@ void display() {
 			if (xSpeed1 < 0)
 			{
 				if (ballX < ballX1)
-				{
-					xSpeed += xSpeed1;
 					xSpeed1 = -xSpeed1;
-				}
 				else
-				{
-					xSpeed1 += xSpeed;
 					xSpeed = -xSpeed;
-				}
 			}
 			else
 			{
@@ -263,15 +257,9 @@ void display() {
 			if (ySpeed1 > 0)
 			{
 				if (ballY > ballY1)
-				{
-					ySpeed += ySpeed1;
 					ySpeed1 = -ySpeed1;
-				}
 				else
-				{
-					ySpeed1 += ySpeed;
 					ySpeed = -ySpeed;
-				}
 			}
 			else
 			{
@@ -284,15 +272,9 @@ void display() {
 			if (ySpeed1 < 0)
 			{
 				if (ballY < ballY1)
-				{
-					ySpeed += ySpeed1;
 					ySpeed1 = -ySpeed1;
-				}
 				else
-				{
-					ySpeed1 += ySpeed;
 					ySpeed = -ySpeed;
-				}
 			}
 			else
 			{
@@ -301,55 +283,42 @@ void display() {
 			}
 		}
 	}
+	*/
 
 	//collision detection for ALL balls
-	for (int i = 0; i <= (sizeof(ballArray) / sizeof(struct BouncyBall)); i++) {
-		for (int j = 0; j <= (sizeof(ballArray) / sizeof(struct BouncyBall)); j++) {
+	for (int i = 0; i <= numberBalls; i++) {
+		for (int j = i+1; j <= numberBalls; j++) {
+
 			GLfloat yCross = ballArray[i].ySpawn - ballArray[j].ySpawn;
 			GLfloat xCross = ballArray[i].xSpawn - ballArray[j].xSpawn;
-			if (i == j) {
-			}
-			//else if (sqrt((ballY1 - ballY)*(ballY1 - ballY) + (ballX1 - ballX)*(ballX1 - ballX)) <= (ballRadius1 + ballRadius)){
-			//i is BallX1, j is BallX
-			else if (sqrt((yCross*yCross) + (xCross*xCross)) <= (ballArray[i].radius + ballArray[j].radius)) {
-				if (ballArray[j].xSpeed > 0)
-				{
-					if (ballArray[i].xSpeed > 0)
-					{
-						if (ballArray[j].xSpawn > ballArray[i].xSpawn)
-						{
-							ballArray[j].xSpeed += ballArray[i].xSpeed;
+
+			if (sqrt((yCross*yCross) + (xCross*xCross)) <= (ballArray[i].radius + ballArray[j].radius)) {
+				if (ballArray[j].xSpeed > 0){
+					if (ballArray[i].xSpeed > 0){
+						if (ballArray[j].xSpawn > ballArray[i].xSpawn) {
 							ballArray[i].xSpeed = -ballArray[i].xSpeed;
 						}
-						else
-						{
-							ballArray[i].xSpeed += ballArray[j].xSpeed;
+
+						else {
+
 							ballArray[j].xSpeed = -ballArray[j].xSpeed;
 						}
 					}
-					else
-					{
+					else{
 						ballArray[j].xSpeed = -ballArray[j].xSpeed;
 						ballArray[i].xSpeed = -ballArray[i].xSpeed;
 					}
 				}
 				else
 				{
-					if (ballArray[i].xSpeed < 0)
-					{
-						if (ballArray[j].xSpawn < ballArray[i].xSpawn)
-						{
-							ballArray[j].xSpeed += ballArray[i].xSpeed;
+					if (ballArray[i].xSpeed < 0){
+						if (ballArray[j].xSpawn < ballArray[i].xSpawn) {
 							ballArray[i].xSpeed = -ballArray[i].xSpeed;
 						}
 						else
-						{
-							ballArray[i].xSpeed += ballArray[j].xSpeed;
 							ballArray[j].xSpeed = -ballArray[j].xSpeed;
-						}
 					}
-					else
-					{
+					else{
 						ballArray[j].xSpeed = -ballArray[j].xSpeed;
 						ballArray[i].xSpeed = -ballArray[i].xSpeed;
 					}
@@ -357,42 +326,26 @@ void display() {
 
 				if (ballArray[j].ySpeed > 0)
 				{
-					if (ballArray[i].ySpeed > 0)
-					{
+					if (ballArray[i].ySpeed > 0){
 						if (ballArray[j].ySpawn > ballArray[i].ySpawn)
-						{
-							ballArray[j].ySpeed += ballArray[i].ySpeed;
 							ballArray[i].ySpeed = -ballArray[i].ySpeed;
-						}
 						else
-						{
-							ballArray[i].ySpeed += ballArray[j].ySpeed;
-							ballArray[j].ySpeed = ballArray[j].ySpeed;
-						}
+							ballArray[j].ySpeed = -ballArray[j].ySpeed;
 					}
-					else
-					{
-						ballArray[j].ySpeed = ballArray[j].ySpeed;
+					else{
+						ballArray[j].ySpeed = -ballArray[j].ySpeed;
 						ballArray[i].ySpeed = -ballArray[i].ySpeed;
 					}
 				}
 				else
 				{
-					if (ballArray[j].ySpeed < 0)
-					{
+					if (ballArray[j].ySpeed < 0){
 						if (ballArray[j].ySpawn < ballArray[i].ySpawn)
-						{
-							ballArray[j].ySpeed += ballArray[i].ySpeed;
 							ballArray[i].ySpeed = -ballArray[i].ySpeed;
-						}
 						else
-						{
-							ballArray[i].ySpeed += ballArray[j].ySpeed;
 							ballArray[j].ySpeed = -ballArray[i].ySpeed;
-						}
 					}
-					else
-					{
+					else{
 						ballArray[j].ySpeed = -ballArray[j].ySpeed;
 						ballArray[i].ySpeed = -ballArray[i].ySpeed;
 					}
@@ -400,7 +353,8 @@ void display() {
 			}
 		}
 	}
-	
+
+	/*
 	//gravity for ball 1
 	if (ySpeed >= 0 && gravlock == false) {
 		ySpeed = ySpeed + grav;
@@ -418,6 +372,7 @@ void display() {
 		gravlock1 = true;
 		ySpeed1 = ySpeed1 - grav;
 	}
+	*/
 
 	//gravity for array balls
 	for (int i = 0; i <= (sizeof(ballArray) / sizeof(struct BouncyBall)); i++) {
@@ -432,6 +387,22 @@ void display() {
 
 }
 
+//using this keyboard function to change the background color (and show transparency)
+void keyboard(unsigned char key, int x, int y)
+{
+	// switching colors at the press of a key
+	GLfloat colors[][3] = { { 0.0f, 0.0f, 0.0f },{ 0.5f, 0.3f, 1.0f } };
+	static int back;
+
+	switch (key) {
+	case 27:
+		exit(0);
+	default:
+		back ^= 1;
+		glClearColor(colors[back][0], colors[back][1], colors[back][2], 1.0f);
+		glutPostRedisplay();
+	}
+}
 
 /* Call back when the windows is re-sized */
 void reshape(GLsizei width, GLsizei height) {
@@ -460,23 +431,19 @@ void reshape(GLsizei width, GLsizei height) {
 
 	gluOrtho2D(clipAreaXLeft, clipAreaXRight, clipAreaYBottom, clipAreaYTop); //sets 2d orthographic viewing region. No touchy.
 
+	
 	ballXMin = clipAreaXLeft + ballRadius;
 	ballXMax = clipAreaXRight - ballRadius;
 	ballYMin = clipAreaYBottom + ballRadius;
 	ballYMax = clipAreaYTop - ballRadius;
-
-	ballXMin1 = clipAreaXLeft + ballRadius1;
-	ballXMax1 = clipAreaXRight - ballRadius1;
-	ballYMin1 = clipAreaYBottom + ballRadius1;
-	ballYMax1 = clipAreaYTop - ballRadius1;
 
 	//array balls
 	for (int i = 0; i <= (sizeof(ballArray) / sizeof(struct BouncyBall)); i++) {
 
 		ballArray[i].XMinBound = clipAreaXLeft + ballArray[i].radius;
 		ballArray[i].XMaxBound = clipAreaXRight - ballArray[i].radius;
-		ballArray[i].XMinBound = clipAreaYBottom + ballArray[i].radius;
-		ballArray[i].XMaxBound = clipAreaYTop - ballArray[i].radius;
+		ballArray[i].YMinBound = clipAreaYBottom + ballArray[i].radius;
+		ballArray[i].YMaxBound = clipAreaYTop - ballArray[i].radius;
 	}
 
 }
@@ -491,9 +458,14 @@ void Timer(int value) {
  BallMaker(int no) {
 	
 	//radius, xSpawn, ySpawn, XMax, Xmin, YMax,YMin, xSpeed, ySpeed, gravity lock
-	struct BouncyBall a = {0.1f + ((0.01f)*no), 0.1f * (no+1), 0.1f * (no+1), 0.0f,0.0f,0.0f,0.0f, 0.01f * (no+1), 0.01f * (no+1), true};
-	ballArray[no] = a;
-
+	 if (no % 2 == 0) {
+		 struct BouncyBall a = { (0.10f) + ((no % 3)*0.01f), 0.35f * (no + 1), 0.56f * (no + 1), 0.0f,0.0f,0.0f,0.0f, 0.006f * (((no + 1) % 3) + 1), 0.0004f * (((no + 1) % 3) + 1), true };
+		 ballArray[no] = a;
+	 }
+	 else {
+		 struct BouncyBall a = { (0.10f) + ((no % 3)*0.01f), -0.35f * (no + 1), 0.56f * (no + 1), 0.0f,0.0f,0.0f,0.0f, -0.006f * (((no + 1) % 3) + 1), -0.0004f * (((no + 1) % 3) + 1), true };
+		 ballArray[no] = a;
+	 }
 	return;
 }
 
@@ -508,12 +480,13 @@ int main(int argc, char** argv) {
 	pthread_create(&tid, NULL, BallMaker(i), (void *)&tid);
 	}*/
 
-	/*for (int i = 0; i < r; i++) {
-		BallMaker(i);
-	}*/
+	struct BouncyBall firstBall = { 0.10f, -0.3f, 0.5f, 0.0f,0.0f,0.0f,0.0f, 0.03f, 0.002f, true };
+	ballArray[0] = firstBall;
 
-	BallMaker(1);
-	BallMaker(2);
+	for (int i = 0; i < r; i++) {
+		BallMaker(i+1);
+	}
+
 
 	//GL stuff
 	glutInit(&argc, argv);            // Boot up GLUT
@@ -525,6 +498,7 @@ int main(int argc, char** argv) {
 	glutReshapeFunc(reshape);     // Register callback handler for window re-shape
 	glutTimerFunc(0, Timer, 0);   // First timer call immediately
 	initGL();                     // Our own OpenGL initialization
+	glutKeyboardFunc(keyboard);
 	glutMainLoop();               // Enter event-processing loop
 
 	//pthread_exit(NULL);
