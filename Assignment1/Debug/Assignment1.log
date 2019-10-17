@@ -1,15 +1,13 @@
-﻿  BallBounce.c
-z:\workspaces\c\myballs\assignment1\ballbounce.c(26): warning C4305: 'initializing': truncation from 'double' to 'GLfloat'
-z:\workspaces\c\myballs\assignment1\ballbounce.c(46): warning C4244: 'function': conversion from 'time_t' to 'unsigned int', possible loss of data
-z:\workspaces\c\myballs\assignment1\ballbounce.c(116): warning C4244: 'function': conversion from 'double' to 'GLfloat', possible loss of data
-z:\workspaces\c\myballs\assignment1\ballbounce.c(307): warning C4244: '=': conversion from 'GLdouble' to 'GLfloat', possible loss of data
-z:\workspaces\c\myballs\assignment1\ballbounce.c(308): warning C4244: '=': conversion from 'GLdouble' to 'GLfloat', possible loss of data
-z:\workspaces\c\myballs\assignment1\ballbounce.c(309): warning C4244: '=': conversion from 'GLdouble' to 'GLfloat', possible loss of data
-z:\workspaces\c\myballs\assignment1\ballbounce.c(310): warning C4244: '=': conversion from 'GLdouble' to 'GLfloat', possible loss of data
-z:\workspaces\c\myballs\assignment1\ballbounce.c(315): warning C4244: '=': conversion from 'GLdouble' to 'GLfloat', possible loss of data
-z:\workspaces\c\myballs\assignment1\ballbounce.c(316): warning C4244: '=': conversion from 'GLdouble' to 'GLfloat', possible loss of data
-z:\workspaces\c\myballs\assignment1\ballbounce.c(317): warning C4244: '=': conversion from 'GLdouble' to 'GLfloat', possible loss of data
-z:\workspaces\c\myballs\assignment1\ballbounce.c(318): warning C4244: '=': conversion from 'GLdouble' to 'GLfloat', possible loss of data
-z:\workspaces\c\myballs\assignment1\ballbounce.c(378): warning C4113: 'void (__cdecl *)()' differs in parameter lists from 'void (__cdecl *)(void)'
-z:\workspaces\c\myballs\assignment1\ballbounce.c(352): warning C4101: 'err': unreferenced local variable
+﻿  BallBounce.cpp
+z:\workspaces\c\myballs\assignment1\ballbounce.cpp(34): warning C4305: 'initializing': truncation from 'double' to 'GLfloat'
+z:\workspaces\c\myballs\assignment1\ballbounce.cpp(54): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+z:\workspaces\c\myballs\assignment1\ballbounce.cpp(315): warning C4244: '=': conversion from 'GLdouble' to 'GLfloat', possible loss of data
+z:\workspaces\c\myballs\assignment1\ballbounce.cpp(316): warning C4244: '=': conversion from 'GLdouble' to 'GLfloat', possible loss of data
+z:\workspaces\c\myballs\assignment1\ballbounce.cpp(317): warning C4244: '=': conversion from 'GLdouble' to 'GLfloat', possible loss of data
+z:\workspaces\c\myballs\assignment1\ballbounce.cpp(318): warning C4244: '=': conversion from 'GLdouble' to 'GLfloat', possible loss of data
+z:\workspaces\c\myballs\assignment1\ballbounce.cpp(323): warning C4244: '=': conversion from 'GLdouble' to 'GLfloat', possible loss of data
+z:\workspaces\c\myballs\assignment1\ballbounce.cpp(324): warning C4244: '=': conversion from 'GLdouble' to 'GLfloat', possible loss of data
+z:\workspaces\c\myballs\assignment1\ballbounce.cpp(325): warning C4244: '=': conversion from 'GLdouble' to 'GLfloat', possible loss of data
+z:\workspaces\c\myballs\assignment1\ballbounce.cpp(326): warning C4244: '=': conversion from 'GLdouble' to 'GLfloat', possible loss of data
+z:\workspaces\c\myballs\assignment1\ballbounce.cpp(360): warning C4101: 'tid': unreferenced local variable
   Assignment1.vcxproj -> Z:\Workspaces\C\MyBalls\Debug\Assignment1.exe

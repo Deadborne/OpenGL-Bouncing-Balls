@@ -12,6 +12,14 @@
 #define HAVE_STRUCT_TIMESPEC
 #include <pthread.h>
 
+#include <iostream>
+#include <thread>
+#include "tbb/task_scheduler_init.h"
+#include "tbb/parallel_for.h"
+#include "tbb/blocked_range.h"
+#include "tbb/tick_count.h"
+using namespace tbb;
+
 #define PI 3.14159265f
 
 //a few Global Variables (sue me) for original ball, gravity, screen refresh.
@@ -326,32 +334,32 @@ void Timer(int value) {
 	glutTimerFunc(refreshMillis, Timer, 0); // subsequent timer call at milliseconds
 }
 
-//creates 2 to 8 additional balls to ruin my life
- void* BallMaker(void *arg) {
-	 
-	 pthread_mutex_lock(&lock);
-	 badIterator++;
-	 int no = badIterator;
-
-	//radius, xSpawn, ySpawn, XMax, Xmin, YMax,YMin, xSpeed, ySpeed, gravity lock
-	 if (no % 2 == 0) {
-		 struct BouncyBall a = { (0.10f) + ((no % 3)*0.01f), 0.35f * (no + 1), 0.56f * (no + 1), 0.0f,0.0f,0.0f,0.0f, 0.009f * (((no + 1) % 3) + 1), 0.0004f * (((no + 1) % 3) + 1), true };
-		 ballArray[no] = a;
+ //tbb function
+ class TbbBallMaker {
+ public:
+	 void operator() (const blocked_range<size_t>&r) const { 
+		 for (size_t i = r.begin(); i != r.end(); i++) {
+			 badIterator++;
+			 int no = badIterator;
+			 //radius, xSpawn, ySpawn, XMax, Xmin, YMax,YMin, xSpeed, ySpeed, gravity lock
+			 if (no % 2 == 0) {
+				 struct BouncyBall a = { (0.10f) + ((no % 3)*0.01f), 0.35f * (no + 1), 0.56f * (no + 1), 0.0f,0.0f,0.0f,0.0f, 0.009f * (((no + 1) % 3) + 1), 0.0004f * (((no + 1) % 3) + 1), true };
+				 ballArray[no] = a;
+			 }
+			 else {
+				 struct BouncyBall a = { (0.05f) * ((no % 3) + 1), -0.35f * (no + 1), 0.56f * (no + 1), 0.0f,0.0f,0.0f,0.0f, -0.009f * (((no + 1) % 3) + 1), -0.0004f * (((no + 1) % 3) + 1), true };
+				 ballArray[no] = a;
+			 }
+		 }		 
 	 }
-	 else {
-		 struct BouncyBall a = { (0.05f) * ((no % 3)+1), -0.35f * (no + 1), 0.56f * (no + 1), 0.0f,0.0f,0.0f,0.0f, -0.009f * (((no + 1) % 3) + 1), -0.0004f * (((no + 1) % 3) + 1), true };
-		 ballArray[no] = a;
-	 }
-	pthread_mutex_unlock(&lock);
-	return NULL;
-}
+ };
 
 /// Main function
 int main(int argc, char** argv) {
 
-	int err;
-
 	pthread_t tid;
+
+	task_scheduler_init init; //Let's boot up our task scheduler for TBB
 
 	if (pthread_mutex_init(&lock, NULL) != 0) {
 		printf("Your mutex is fucked.\n");
@@ -359,15 +367,20 @@ int main(int argc, char** argv) {
 	}
 	
 	int r = random();
-	numberBalls = r;
+	numberBalls = r; //also the number of times BallMaker will run
 
 	struct BouncyBall firstBall = { 0.10f, -0.3f, 0.5f, 0.0f,0.0f,0.0f,0.0f, 0.03f, 0.002f, true };
 	ballArray[0] = firstBall;
 
-	for (int i = 0; i < r; i++) {
+	/*for (int i = 0; i < r; i++) {
 		pthread_create(&tid, NULL, BallMaker, NULL);
 	}
 	pthread_join(tid, NULL);
+	*/
+
+	//Go, TBB!
+	parallel_for(blocked_range<size_t>(0, numberBalls), TbbBallMaker());
+
 
 	//GL stuff
 	glutInit(&argc, argv);            // Boot up GLUT
@@ -382,7 +395,7 @@ int main(int argc, char** argv) {
 	glutKeyboardFunc(keyboard);   // Keyboard function for changing background
 	glutMainLoop();               // Event loop
 
-	pthread_exit(NULL);
+	//pthread_exit(NULL);
 	pthread_mutex_destroy(&lock);
 
 	return 0;
