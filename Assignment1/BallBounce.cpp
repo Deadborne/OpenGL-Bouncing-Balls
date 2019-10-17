@@ -357,7 +357,7 @@ void Timer(int value) {
 /// Main function
 int main(int argc, char** argv) {
 
-	pthread_t tid;
+	//pthread_t tid;
 
 	task_scheduler_init init; //Let's boot up our task scheduler for TBB
 
