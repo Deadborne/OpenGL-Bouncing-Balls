@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="BallBounce.cpp">
+    <ClCompile Include="BallBounce.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

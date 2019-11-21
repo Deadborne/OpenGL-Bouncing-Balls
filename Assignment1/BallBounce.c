@@ -12,13 +12,8 @@
 #define HAVE_STRUCT_TIMESPEC
 #include <pthread.h>
 
-#include <iostream>
-#include <thread>
-#include "tbb/task_scheduler_init.h"
-#include "tbb/parallel_for.h"
-#include "tbb/blocked_range.h"
-#include "tbb/tick_count.h"
-using namespace tbb;
+#include "cuda_runtime.h"
+#include "device_launch_parameters.h"
 
 #define PI 3.14159265f
 
@@ -41,9 +36,9 @@ int badIterator = 0;
 
 
 void iteratorUp() {
-		pthread_mutex_lock(&lock);
+	pthread_mutex_lock(&lock);
 	badIterator++;
-		pthread_mutex_unlock(&lock);
+	pthread_mutex_unlock(&lock);
 }
 
 
@@ -53,18 +48,19 @@ int random()
 	int r;
 	srand(time(NULL));
 	r = rand() % 7 + 2;
-	printf("Behold, a fiesta with %d balls\n ", r+1);
+	printf("Behold, a fiesta with %d balls\n ", r + 1);
 	return r;
 };
 
 //bouncy ball struct for additional balls
-struct BouncyBall {
+typedef struct BouncyBall {
 	GLfloat radius;
 	GLfloat xSpawn, ySpawn;
 	GLfloat XMaxBound, XMinBound, YMaxBound, YMinBound;
 	GLfloat xSpeed, ySpeed;
 	bool glock;
-};
+} BouncyBall;
+
 static struct BouncyBall ballArray[11];
 
 GLfloat v1, v2, v3, v4, v5, v6, v7, v8, v9;
@@ -117,9 +113,9 @@ void display() {
 		else if (i % 3 == 2) {
 			glColor4f(0.0f, 0.0f, 1.0f, 0.5f);
 		}
-		glVertex2f(ballArray[i].xSpawn, ballArray[i].ySpawn); 
+		glVertex2f(ballArray[i].xSpawn, ballArray[i].ySpawn);
 		GLfloat angleX;
-		for (int j = 0; j <= numSegments; j++) { 
+		for (int j = 0; j <= numSegments; j++) {
 			angleX = j * 2.0f * PI / numSegments;
 			glVertex2f(ballArray[i].xSpawn + cos(angleX) * ballArray[i].radius, ballArray[i].ySpawn + sin(angleX) * ballArray[i].radius);
 		}
@@ -147,7 +143,7 @@ void display() {
 			ballArray[i].xSpawn = ballXMax;
 			ballArray[i].xSpeed = -ballArray[i].xSpeed;
 		}
-		else if (ballArray[i].xSpawn < ballXMin){
+		else if (ballArray[i].xSpawn < ballXMin) {
 			ballArray[i].xSpawn = ballXMin;
 			ballArray[i].xSpeed = -ballArray[i].xSpeed;
 		}
@@ -166,21 +162,21 @@ void display() {
 	for (int i = 0; i <= numberBalls; i++) {
 		if (ballArray[i].ySpeed < -0.3f)
 			ballArray[i].ySpeed = -0.0006f;
-		if(ballArray[i].ySpeed > 0.3f)
+		if (ballArray[i].ySpeed > 0.3f)
 			ballArray[i].ySpeed = 0.0006f;
 	}
 
 
 	//collision detection for ALL balls
 	for (int i = 0; i <= numberBalls; i++) {
-		for (int j = i+1; j <= numberBalls; j++) {
+		for (int j = i + 1; j <= numberBalls; j++) {
 
 			GLfloat yCross = ballArray[i].ySpawn - ballArray[j].ySpawn;
 			GLfloat xCross = ballArray[i].xSpawn - ballArray[j].xSpawn;
 
 			if (sqrt((yCross*yCross) + (xCross*xCross)) <= (ballArray[i].radius + ballArray[j].radius)) {
-				if (ballArray[j].xSpeed > 0){
-					if (ballArray[i].xSpeed > 0){
+				if (ballArray[j].xSpeed > 0) {
+					if (ballArray[i].xSpeed > 0) {
 						if (ballArray[j].xSpawn > ballArray[i].xSpawn) {
 							ballArray[i].xSpeed = -ballArray[i].xSpeed;
 							if (ballArray[j].xSpeed < 0) //to check
@@ -193,14 +189,14 @@ void display() {
 								ballArray[j].xSpawn -= ballArray[i].radius;
 						}
 					}
-					else{
+					else {
 						ballArray[j].xSpeed = -ballArray[j].xSpeed;
 						ballArray[i].xSpeed = -ballArray[i].xSpeed;
 					}
 				}
 				else
 				{
-					if (ballArray[i].xSpeed < 0){
+					if (ballArray[i].xSpeed < 0) {
 						if (ballArray[j].xSpawn < ballArray[i].xSpawn) {
 							ballArray[i].xSpeed = -ballArray[i].xSpeed;
 							if (ballArray[j].xSpeed > 0) //to check
@@ -212,7 +208,7 @@ void display() {
 								ballArray[j].xSpawn += ballArray[i].radius;
 						}
 					}
-					else{
+					else {
 						ballArray[j].xSpeed = -ballArray[j].xSpeed;
 						ballArray[i].xSpeed = -ballArray[i].xSpeed;
 					}
@@ -220,7 +216,7 @@ void display() {
 
 				if (ballArray[j].ySpeed > 0)
 				{
-					if (ballArray[i].ySpeed > 0){
+					if (ballArray[i].ySpeed > 0) {
 						if (ballArray[j].ySpawn > ballArray[i].ySpawn) {
 							ballArray[i].ySpeed = -ballArray[i].ySpeed;
 						}
@@ -228,14 +224,14 @@ void display() {
 							ballArray[j].ySpeed = -ballArray[j].ySpeed;
 						}
 					}
-					else{
+					else {
 						ballArray[j].ySpeed = -ballArray[j].ySpeed;
 						ballArray[i].ySpeed = -ballArray[i].ySpeed;
 					}
 				}
 				else
 				{
-					if (ballArray[j].ySpeed < 0){
+					if (ballArray[j].ySpeed < 0) {
 						if (ballArray[j].ySpawn < ballArray[i].ySpawn) {
 							ballArray[i].ySpeed = -ballArray[i].ySpeed;
 							ballArray[j].ySpawn += ballArray[i].radius;
@@ -245,7 +241,7 @@ void display() {
 							ballArray[j].ySpawn += ballArray[i].radius;
 						}
 					}
-					else{
+					else {
 						ballArray[j].ySpeed = -ballArray[j].ySpeed;
 						ballArray[i].ySpeed = -ballArray[i].ySpeed;
 					}
@@ -311,7 +307,7 @@ void reshape(GLsizei width, GLsizei height) {
 
 	gluOrtho2D(clipAreaXLeft, clipAreaXRight, clipAreaYBottom, clipAreaYTop); //sets 2d orthographic viewing region. No touchy.
 
-	
+
 	ballXMin = clipAreaXLeft + ballRadius;
 	ballXMax = clipAreaXRight - ballRadius;
 	ballYMin = clipAreaYBottom + ballRadius;
@@ -334,54 +330,83 @@ void Timer(int value) {
 	glutTimerFunc(refreshMillis, Timer, 0); // subsequent timer call at milliseconds
 }
 
- //tbb function
- class TbbBallMaker {
- public:
-	 void operator() (const blocked_range<size_t>&r) const { 
-		 for (size_t i = r.begin(); i != r.end(); i++) {
-			 badIterator++;
-			 int no = badIterator;
-			 //radius, xSpawn, ySpawn, XMax, Xmin, YMax,YMin, xSpeed, ySpeed, gravity lock
-			 if (no % 2 == 0) {
-				 struct BouncyBall a = { (0.10f) + ((no % 3)*0.01f), 0.35f * (no + 1), 0.56f * (no + 1), 0.0f,0.0f,0.0f,0.0f, 0.009f * (((no + 1) % 3) + 1), 0.0004f * (((no + 1) % 3) + 1), true };
-				 ballArray[no] = a;
-			 }
-			 else {
-				 struct BouncyBall a = { (0.05f) * ((no % 3) + 1), -0.35f * (no + 1), 0.56f * (no + 1), 0.0f,0.0f,0.0f,0.0f, -0.009f * (((no + 1) % 3) + 1), -0.0004f * (((no + 1) % 3) + 1), true };
-				 ballArray[no] = a;
-			 }
-		 }		 
-	 }
- };
+//creates 2 to 8 additional balls to ruin my life
+void* BallMaker(void *arg) {
+
+	//pthread_mutex_lock(&lock);
+	badIterator++;
+	int no = badIterator;
+
+	//radius, xSpawn, ySpawn, XMax, Xmin, YMax,YMin, xSpeed, ySpeed, gravity lock
+	if (no % 2 == 0) {
+		struct BouncyBall a = { (0.10f) + ((no % 3)*0.01f), 0.35f * (no + 1), 0.56f * (no + 1), 0.0f,0.0f,0.0f,0.0f, 0.009f * (((no + 1) % 3) + 1), 0.0004f * (((no + 1) % 3) + 1), true };
+		ballArray[no] = a;
+	}
+	else {
+		struct BouncyBall a = { (0.05f) * ((no % 3) + 1), -0.35f * (no + 1), 0.56f * (no + 1), 0.0f,0.0f,0.0f,0.0f, -0.009f * (((no + 1) % 3) + 1), -0.0004f * (((no + 1) % 3) + 1), true };
+		ballArray[no] = a;
+	}
+	//pthread_mutex_unlock(&lock);
+	return NULL;
+}
+
+__global__ void testKernel(struct BouncyBall *b)
+{
+	int i = blockIdx.x * blockDim.x + threadIdx.x;
+	b[i].radius = 0.1;
+	b[i].xSpawn = 0.7f;
+	b[i].ySpawn = 1.4f;
+	b[i].XMaxBound = 0.0f;
+	b[i].YMaxBound = 0.0f;
+	b[i].XMinBound = 0.0f;
+	b[i].YMinBound = 0.0f;
+	b[i].xSpeed = 0.018f;
+	b[i].ySpeed = 0.0008f;
+	b[i].glock = true;
+}
 
 /// Main function
 int main(int argc, char** argv) {
 
-	//pthread_t tid;
-
-	task_scheduler_init init; //Let's boot up our task scheduler for TBB
+	int err;
 
 	if (pthread_mutex_init(&lock, NULL) != 0) {
 		printf("Your mutex is fucked.\n");
 		return 1;
 	}
-	
+
 	int r = random();
-	numberBalls = r; //also the number of times BallMaker will run
+	numberBalls = r;
 
 	struct BouncyBall firstBall = { 0.10f, -0.3f, 0.5f, 0.0f,0.0f,0.0f,0.0f, 0.03f, 0.002f, true };
 	ballArray[0] = firstBall;
+
+	//we try some CUDA stuff
+	int numBalls		= 1,
+		gpuBlockSize	= 4,
+		ballSize		= sizeOf(firstBall),
+		numBytes		= numBalls * ballSize,
+		gpuGridSize		= numBalls / gpuBlockSize;
+
+		//allocate memory
+	BouncyBall *cpuBallArray,
+		*gpuBallArray;
+	gpuBallArray = (BouncyBall*)malloc(numBytes);
+	cudaMalloc((void**)&gpuBallArray, numBytes);
+
+		//launching the kernel
+	testKernel<<<gpuGridSize,gpuBlockSize>>>(gpuBallArray);
+
+		//retrieve results
+	cudaMemcpy(cpuBallArray, gpuBallArray, numBytes, cudaMemcpyDeviceToHost);
+	free(cpuBallArray);
+	cudaFree(gpuBallArray);
 
 	/*for (int i = 0; i < r; i++) {
 		pthread_create(&tid, NULL, BallMaker, NULL);
 	}
 	pthread_join(tid, NULL);
 	*/
-
-	//Go, TBB!
-	parallel_for(blocked_range<size_t>(0, numberBalls), TbbBallMaker());
-
-
 	//GL stuff
 	glutInit(&argc, argv);            // Boot up GLUT
 	glutInitDisplayMode(GLUT_DOUBLE); // For double-buffered mode
@@ -395,7 +420,6 @@ int main(int argc, char** argv) {
 	glutKeyboardFunc(keyboard);   // Keyboard function for changing background
 	glutMainLoop();               // Event loop
 
-	//pthread_exit(NULL);
 	pthread_mutex_destroy(&lock);
 
 	return 0;

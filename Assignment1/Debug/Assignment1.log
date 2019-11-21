@@ -1,13 +1,2 @@
-﻿  BallBounce.cpp
-z:\workspaces\c\myballs\assignment1\ballbounce.cpp(34): warning C4305: 'initializing': truncation from 'double' to 'GLfloat'
-z:\workspaces\c\myballs\assignment1\ballbounce.cpp(54): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-z:\workspaces\c\myballs\assignment1\ballbounce.cpp(315): warning C4244: '=': conversion from 'GLdouble' to 'GLfloat', possible loss of data
-z:\workspaces\c\myballs\assignment1\ballbounce.cpp(316): warning C4244: '=': conversion from 'GLdouble' to 'GLfloat', possible loss of data
-z:\workspaces\c\myballs\assignment1\ballbounce.cpp(317): warning C4244: '=': conversion from 'GLdouble' to 'GLfloat', possible loss of data
-z:\workspaces\c\myballs\assignment1\ballbounce.cpp(318): warning C4244: '=': conversion from 'GLdouble' to 'GLfloat', possible loss of data
-z:\workspaces\c\myballs\assignment1\ballbounce.cpp(323): warning C4244: '=': conversion from 'GLdouble' to 'GLfloat', possible loss of data
-z:\workspaces\c\myballs\assignment1\ballbounce.cpp(324): warning C4244: '=': conversion from 'GLdouble' to 'GLfloat', possible loss of data
-z:\workspaces\c\myballs\assignment1\ballbounce.cpp(325): warning C4244: '=': conversion from 'GLdouble' to 'GLfloat', possible loss of data
-z:\workspaces\c\myballs\assignment1\ballbounce.cpp(326): warning C4244: '=': conversion from 'GLdouble' to 'GLfloat', possible loss of data
-z:\workspaces\c\myballs\assignment1\ballbounce.cpp(360): warning C4101: 'tid': unreferenced local variable
-  Assignment1.vcxproj -> Z:\Workspaces\C\MyBalls\Debug\Assignment1.exe
+﻿  BallBounce.c
+z:\workspaces\c\myballs\assignment1\ballbounce.c(15): fatal error C1083: Cannot open include file: 'cuda_runtime.h': No such file or directory
